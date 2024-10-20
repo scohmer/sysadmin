@@ -22,6 +22,10 @@ if exist requirements.txt (
     echo requirements.txt not found. Skipping dependency installation.
 )
 
+REM Create a bcrypt salt based upon the word in SALT_GEN
+echo Generating bcrypt salt...
+python3 generate_salt.py
+
 REM Check if PyInstaller is installed, install if not
 pip show pyinstaller >nul 2>&1
 IF ERRORLEVEL 1 (

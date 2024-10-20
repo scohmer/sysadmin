@@ -5,10 +5,26 @@ import csv
 from datetime import datetime
 import getpass
 import os
+import bcrypt
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Paths for the log files
 json_file_path = "maintenance_logs.json"
 csv_file_path = "maintenance_logs.csv"
+
+# Get the salt from the environment variable
+bcrypt_salt = os.getenv("BCRYPT_SALT").encode('utf-8')
+
+# Function to generate a unique ID using bcrypt
+def generate_unique_id(data):
+    # Combine data fields into a single string
+    combined_data = f"{data['hostname']}{data['action_taken']}{data['username']}{data['timestamp']}".encode('utf-8')
+    # Generate a bcrypt hash using the provided salt
+    hash_id = bcrypt.hashpw(combined_data, bcrypt_salt)
+    return hash_id.decode('utf-8')
 
 # Function to log actions (Logger)
 def log_action():
@@ -31,6 +47,10 @@ def log_action():
         "timestamp": timestamp
     }
 
+    # Generate unique ID for the log entry
+    unique_id = generate_unique_id(log_entry)
+    log_entry["unique_id"] = unique_id
+
     # Append to JSON file
     if not os.path.exists(json_file_path):
         with open(json_file_path, 'w') as json_file:
@@ -45,7 +65,7 @@ def log_action():
     # Append to CSV file
     file_exists = os.path.isfile(csv_file_path)
     with open(csv_file_path, 'a', newline='') as csv_file:
-        fieldnames = ["hostname", "action_taken", "username", "timestamp"]
+        fieldnames = ["hostname", "action_taken", "username", "timestamp", "unique_id"]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
         if not file_exists:
@@ -72,7 +92,52 @@ def load_logs():
         log_text.insert(tk.END, f"Action Taken: {log['action_taken']}\n")
         log_text.insert(tk.END, f"Username: {log['username']}\n")
         log_text.insert(tk.END, f"Timestamp: {log['timestamp']}\n")
+        log_text.insert(tk.END, f"Unique ID: {log['unique_id']}\n")
         log_text.insert(tk.END, "-" * 40 + "\n")
+
+# Function to check log integrity
+def open_log_integrity():
+    # Load logs from the JSON file
+    with open(json_file_path, 'r') as json_file:
+        logs = json.load(json_file)
+
+    # Initialize the result
+    integrity_results = []
+
+    # Iterate through the logs to check the integrity
+    for log in logs:
+        # Generate a new hash based on the current log data
+        current_log_data = {
+            "hostname": log['hostname'],
+            "action_taken": log['action_taken'],
+            "username": log['username'],
+            "timestamp": log['timestamp']
+        }
+
+        # Generate a bcrypt hash using the current log data
+        current_hash = generate_unique_id(current_log_data)
+
+        # Compare the new hash with the stored unique_id
+        if current_hash == log['unique_id']:
+            result = f"Log entry with unique_id '{log['unique_id']}' is intact."
+        else:
+            result = f"WARNING: Log entry with unique_id '{log['unique_id']}' has been tampered with!"
+
+        # Append the result to the integrity results
+        integrity_results.append(result)
+
+    # Display integrity results
+    log_text.delete(1.0, tk.END)
+    for result in integrity_results:
+        log_text.insert(tk.END, result + "\n")
+        log_text.insert(tk.END, "-" * 40 + "\n")
+
+    # Messagebox summary
+    intact_count = sum("is intact" in r for r in integrity_results)
+    tampered_count = len(integrity_results) - intact_count
+
+    summary_message = f"Integrity check complete: {intact_count} intact, {tampered_count} tampered."
+    messagebox.showinfo("Integrity Check Results", summary_message)
 
 # Function to open Logger window
 def open_logger():
@@ -108,6 +173,9 @@ def open_viewer():
 
     load_button = tk.Button(viewer_window, text="Load Logs", command=load_logs)
     load_button.pack(pady=5)
+
+    integrity_button = tk.Button(viewer_window, text="Check Log Integrity", command=open_log_integrity)
+    integrity_button.pack(pady=5)
 
     # When the viewer window is closed, reopen the menu
     viewer_window.protocol("WM_DELETE_WINDOW", lambda: on_window_close(viewer_window))
