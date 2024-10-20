@@ -5,4 +5,6 @@
 
 git clone the repo
 
+modify variable within .env with a value to encrypt/decrypt log entries.
+
 call install.bat
