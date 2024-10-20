@@ -1,1 +1,0 @@
-import bcrypt, os; from dotenv import load_dotenv, set_key; load_dotenv(); salt_gen = os.getenv("SALT_GEN").encode('utf-8'); bcrypt_salt = bcrypt.hashpw(salt_gen, bcrypt.gensalt()).decode('utf-8'); set_key('.env', 'BCRYPT_SALT', bcrypt_salt)

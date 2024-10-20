@@ -1,10 +1,11 @@
 --find-links ./dependencies
 altgraph==0.17.4
-bcrypt==4.2.0
 packaging==24.1
 pefile==2023.2.7
 pyinstaller==6.11.0
 pyinstaller-hooks-contrib==2024.9
 python-dotenv==1.0.1
+pywin32==308
 pywin32-ctypes==0.2.3
 setuptools==75.2.0
+WMI==1.5.1
