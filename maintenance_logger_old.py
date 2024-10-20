@@ -117,7 +117,7 @@ def open_log_integrity():
             "timestamp": log['timestamp']
         }
 
-        # Generate a bcrypt hash using the current log data
+        # Generate a SHA256 hash using the current log data
         current_hash = generate_unique_id(current_log_data)
 
         # Compare the new hash with the stored unique_id
