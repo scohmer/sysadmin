@@ -5,7 +5,7 @@ import csv
 from datetime import datetime
 import getpass
 import os
-import bcrypt
+import hashlib
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -15,16 +15,19 @@ load_dotenv()
 json_file_path = "maintenance_logs.json"
 csv_file_path = "maintenance_logs.csv"
 
-# Get the salt from the environment variable
-bcrypt_salt = os.getenv("BCRYPT_SALT").encode('utf-8')
+# Get salt from environment variable or generate one
+salt = os.getenv("SALT_GEN", os.urandom(16)).encode('utf-8')
 
-# Function to generate a unique ID using bcrypt
+# Function to generate a unique ID using SHA-256 with salt
 def generate_unique_id(data):
     # Combine data fields into a single string
     combined_data = f"{data['hostname']}{data['action_taken']}{data['username']}{data['timestamp']}".encode('utf-8')
-    # Generate a bcrypt hash using the provided salt
-    hash_id = bcrypt.hashpw(combined_data, bcrypt_salt)
-    return hash_id.decode('utf-8')
+
+    # Combine the salt and the data
+    salted_data = salt + combined_data
+
+    # Generate a SHA-256 hash
+    return hashlib.sha256(salted_data).hexdigest()
 
 # Function to log actions (Logger)
 def log_action():
