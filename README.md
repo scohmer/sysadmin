@@ -3,8 +3,6 @@
 2. Logger
 3. Viewer
 
-use requirements.txt to get dependencies
+git clone the repo
 
-use pyinstaller to create maintenance_logger.exe:
-
-pyinstaller --onefile --windowed your_python_script.py
+call install.bat
