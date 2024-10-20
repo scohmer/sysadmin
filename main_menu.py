@@ -1,13 +1,16 @@
 import tkinter as tk
 import subprocess
+import os
 
 # Function to launch the logger application
 def open_logger():
-    subprocess.Popen(['python', 'logger_app.py'])  # Assuming logger_app.py is the logger script file
+    logger_path = os.path.join(os.path.dirname(__file__), 'logger_app.exe')
+    subprocess.Popen([logger_path], shell=True)
 
 # Function to launch the viewer application
 def open_viewer():
-    subprocess.Popen(['python', 'viewer_app.py'])  # Assuming viewer_app.py is the viewer script file
+    viewer_path = os.path.join(os.path.dirname(__file__), 'viewer_app.exe')
+    subprocess.Popen([viewer_path], shell=True)
 
 # Create the main menu window
 def main_menu():
