@@ -1,4 +1,10 @@
 # sysadmin logging application
-1. Logging app
-2. Viewing app
-3. Main menu app
+1. Main menu
+2. Logger
+3. Viewer
+
+use requirements.txt to get dependencies
+
+use pyinstaller to create maintenance_logger.exe:
+
+pyinstaller --onefile --windowed your_python_script.py
