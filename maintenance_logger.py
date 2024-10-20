@@ -5,47 +5,10 @@ import csv
 from datetime import datetime
 import getpass
 import os
-import hashlib
 
 # Paths for the log files
 json_file_path = "maintenance_logs.json"
 csv_file_path = "maintenance_logs.csv"
-
-# Function to generate a SHA-256 hash for a log entry
-def generate_hash(log_entry):
-    log_string = json.dumps(log_entry, sort_keys=True).encode()
-    return hashlib.sha256(log_string).hexdigest()
-
-# Function to get the hash of the last log entry
-def get_last_hash():
-    if not os.path.exists(json_file_path) or os.stat(json_file_path).st_size == 0:
-        return None  # No previous hash, first entry
-    with open(json_file_path, 'r') as log_file:
-        logs = json.load(log_file)
-        return logs[-1]["current_hash"]
-
-# Function to verify log integrity
-def verify_logs():
-    if not os.path.exists(json_file_path):
-        return True  # No logs to verify
-
-    with open(json_file_path, 'r') as log_file:
-        logs = json.load(log_file)
-
-    for i in range(1, len(logs)):
-        current_log = logs[i]
-        previous_log = logs[i - 1]
-
-        # Check if the previous hash matches the current log's stored previous_hash
-        if previous_log["current_hash"] != current_log["previous_hash"]:
-            return False
-
-        # Verify the hash of the current log
-        recalculated_hash = generate_hash(current_log)
-        if recalculated_hash != current_log["current_hash"]:
-            return False
-
-    return True
 
 # Function to log actions (Logger)
 def log_action():
@@ -60,20 +23,13 @@ def log_action():
     username = getpass.getuser()
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # Get the last log entry's hash (if any)
-    last_hash = get_last_hash()
-
-    # Create the new log entry
+    # Data to be logged
     log_entry = {
         "hostname": hostname,
         "action_taken": action_taken,
         "username": username,
-        "timestamp": timestamp,
-        "previous_hash": last_hash,
+        "timestamp": timestamp
     }
-
-    # Generate the current hash for this log entry
-    log_entry["current_hash"] = generate_hash(log_entry)
 
     # Append to JSON file
     if not os.path.exists(json_file_path):
@@ -89,7 +45,7 @@ def log_action():
     # Append to CSV file
     file_exists = os.path.isfile(csv_file_path)
     with open(csv_file_path, 'a', newline='') as csv_file:
-        fieldnames = ["hostname", "action_taken", "username", "timestamp", "previous_hash", "current_hash"]
+        fieldnames = ["hostname", "action_taken", "username", "timestamp"]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
         if not file_exists:
@@ -104,10 +60,6 @@ def log_action():
 
 # Function to load and display logs (Viewer)
 def load_logs():
-    if not verify_logs():
-        messagebox.showerror("Log Integrity Error", "Log integrity has been violated!")
-        return
-
     with open(json_file_path, 'r') as json_file:
         logs = json.load(json_file)
     
@@ -120,8 +72,6 @@ def load_logs():
         log_text.insert(tk.END, f"Action Taken: {log['action_taken']}\n")
         log_text.insert(tk.END, f"Username: {log['username']}\n")
         log_text.insert(tk.END, f"Timestamp: {log['timestamp']}\n")
-        log_text.insert(tk.END, f"Previous Hash: {log['previous_hash']}\n")
-        log_text.insert(tk.END, f"Current Hash: {log['current_hash']}\n")
         log_text.insert(tk.END, "-" * 40 + "\n")
 
 # Function to open Logger window
