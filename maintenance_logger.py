@@ -97,7 +97,7 @@ def log_action():
     log_entry["unique_id"] = unique_id
 
     try:
-        # Append to JSON file
+        # Append to JSON file (keeping the unique_id here)
         with open(json_file_path, 'r+') as json_file:
             try:
                 logs = json.load(json_file)
@@ -110,6 +110,10 @@ def log_action():
         with open(json_file_path, 'w') as json_file:
             json.dump([log_entry], json_file, indent=4)
 
+    # Prepare log entry for CSV (remove unique_id before writing)
+    csv_log_entry = log_entry.copy()  # Create a copy of the log entry
+    del csv_log_entry["unique_id"]  # Remove unique_id before writing to CSV
+
     # Append to CSV file
     file_exists = os.path.isfile(csv_file_path)
     with open(csv_file_path, 'a', newline='') as csv_file:
@@ -119,7 +123,7 @@ def log_action():
         if not file_exists:
             writer.writeheader()
 
-        writer.writerow(log_entry)
+        writer.writerow(csv_log_entry)
 
     # Success message after log entry is written
     print("Log action reached")  # Debugging line to check if this point is reached
