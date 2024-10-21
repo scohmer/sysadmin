@@ -46,11 +46,24 @@ if env_salt:
 else:
     salt = os.urandom(16)
 
-# Function to generate a unique ID using SHA-256 with salt
+# Function to generate a unique ID using SHA-256 with salt (still used internally for integrity checks)
 def generate_unique_id(data):
     combined_data = f"{data['hostname']}{data['action_taken']}{data['username']}{data['timestamp']}".encode('utf-8')
     salted_data = salt + combined_data
     return hashlib.sha256(salted_data).hexdigest()
+
+# Function to get the next auto-incrementing entry_id
+def get_next_entry_id():
+    try:
+        with open(json_file_path, 'r') as json_file:
+            logs = json.load(json_file)
+            if logs:
+                # Get the last entry's ID and increment it by 1
+                last_entry_id = logs[-1].get("entry_id", 0)
+                return last_entry_id + 1
+    except (FileNotFoundError, json.JSONDecodeError):
+        # If no logs exist, start from 1
+        return 1
 
 # Function to log actions (Logger)
 def log_action():
@@ -68,14 +81,18 @@ def log_action():
         return
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    # Get the next entry ID
+    entry_id = get_next_entry_id()
+
     log_entry = {
+        "entry_id": entry_id,
         "hostname": hostname,
         "action_taken": action_taken,
         "username": full_name,
         "timestamp": timestamp
     }
 
-    # Generate unique ID for the log entry
+    # Generate unique ID for internal use only
     unique_id = generate_unique_id(log_entry)
     log_entry["unique_id"] = unique_id
 
@@ -96,7 +113,7 @@ def log_action():
     # Append to CSV file
     file_exists = os.path.isfile(csv_file_path)
     with open(csv_file_path, 'a', newline='') as csv_file:
-        fieldnames = ["hostname", "action_taken", "username", "timestamp", "unique_id"]
+        fieldnames = ["entry_id", "hostname", "action_taken", "username", "timestamp"]
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
 
         if not file_exists:
@@ -119,14 +136,14 @@ def load_logs():
     log_text.delete(1.0, tk.END)
 
     for log in logs:
+        log_text.insert(tk.END, f"Log Entry ID: {log['entry_id']}\n")
         log_text.insert(tk.END, f"Hostname: {log['hostname']}\n")
         log_text.insert(tk.END, f"Action Taken: {log['action_taken']}\n")
         log_text.insert(tk.END, f"Username: {log['username']}\n")
         log_text.insert(tk.END, f"Timestamp: {log['timestamp']}\n")
-        log_text.insert(tk.END, f"Unique ID: {log['unique_id']}\n")
         log_text.insert(tk.END, "-" * 40 + "\n")
 
-# Function to check log integrity
+# Function to check log integrity (but hide unique_id in output)
 def open_log_integrity():
     try:
         with open(json_file_path, 'r') as json_file:
@@ -147,9 +164,9 @@ def open_log_integrity():
         current_hash = generate_unique_id(current_log_data)
 
         if current_hash == log['unique_id']:
-            result = f"Log entry with unique_id '{log['unique_id']}' is intact."
+            result = f"Log entry with ID '{log['entry_id']}' is intact."
         else:
-            result = f"WARNING: Log entry with unique_id '{log['unique_id']}' has been tampered with!"
+            result = f"WARNING: Log entry with ID '{log['entry_id']}' has been tampered with!"
         integrity_results.append(result)
 
     log_text.delete(1.0, tk.END)
