@@ -235,6 +235,14 @@ def on_window_close(window):
 app = tk.Tk()
 app.title("Maintenance Log Menu")
 
+# Load the company logo (make sure you have a .png logo in the same directory)
+logo = PhotoImage(file="images/company_logo.png")
+
+# Display the company logo at the top of the window
+logo_label = tk.Label(app, image=logo)
+logo_label.pack(pady=20)
+
+# Add the title and buttons
 tk.Label(app, text="Select an Application", font=('Helvetica', 14)).pack(pady=20)
 
 logger_button = tk.Button(app, text="Open Logger", command=open_logger, width=20)
