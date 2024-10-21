@@ -41,7 +41,7 @@ IF ERRORLEVEL 1 (
 )
 
 REM Use Python to load the LOGO_IMG path from the .env file
-FOR /F "tokens=*" %%i IN ('python get_env.py') DO SET LOGO_IMG=%%i
+FOR /F "tokens=*" %%i IN ('python get_env_var.py') DO SET LOGO_IMG=%%i
 
 REM Create the executable using PyInstaller, now with LOGO_IMG from the .env file
 echo Creating the executable...
