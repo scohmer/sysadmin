@@ -12,3 +12,8 @@ modify LOGO_IMG variable within .env with the path to your company logo
 Run install.bat from CMD
 
 ## Screenshots
+
+![image](./screenshots/main.png)
+![image](./screenshots/logger.png)
+![image](./screenshots/viewer.png)
+![image](./screenshots/integrity.png)
