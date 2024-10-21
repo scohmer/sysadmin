@@ -13,3 +13,9 @@ Run install.bat from CMD
 ## Screenshots
 
 ![image](./screenshots/main.png)
+
+![image](./screenshots/logger.png)
+
+![image](./screenshots/viewer.png)
+
+![image](./screenshots/integrity.png)
