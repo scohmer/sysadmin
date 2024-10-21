@@ -96,8 +96,8 @@ def log_action():
     unique_id = generate_unique_id(log_entry)
     log_entry["unique_id"] = unique_id
 
-    # Append to JSON file
     try:
+        # Append to JSON file
         with open(json_file_path, 'r+') as json_file:
             try:
                 logs = json.load(json_file)
@@ -122,6 +122,7 @@ def log_action():
         writer.writerow(log_entry)
 
     # Success message after log entry is written
+    print("Log action reached")  # Debugging line to check if this point is reached
     messagebox.showinfo("Success", f"Action logged successfully! Log Entry ID: {entry_id}")
     
     # Clear inputs
