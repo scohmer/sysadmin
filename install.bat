@@ -40,9 +40,12 @@ IF ERRORLEVEL 1 (
     pip install pyinstaller
 )
 
-REM Create the executable using PyInstaller
+REM Use Python to load the LOGO_IMG path from the .env file
+FOR /F "tokens=*" %%i IN ('python get_env.py') DO SET LOGO_IMG=%%i
+
+REM Create the executable using PyInstaller, now with LOGO_IMG from the .env file
 echo Creating the executable...
-pyinstaller --add-data "images/company_logo.png:images" --onefile --windowed maintenance_logger.py
+pyinstaller --add-data "%LOGO_IMG%:images" --onefile --windowed maintenance_logger.py
 
 REM Clean up PyInstaller build files
 echo Cleaning up build files...
