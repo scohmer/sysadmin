@@ -121,7 +121,10 @@ def log_action():
 
         writer.writerow(log_entry)
 
-    messagebox.showinfo("Success", "Action logged successfully!")
+    # Success message after log entry is written
+    messagebox.showinfo("Success", f"Action logged successfully! Log Entry ID: {entry_id}")
+    
+    # Clear inputs
     hostname_entry.delete(0, tk.END)
     action_entry.delete(0, tk.END)
 
