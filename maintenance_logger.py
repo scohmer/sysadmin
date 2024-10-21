@@ -37,9 +37,12 @@ def get_user_full_name():
                     return username  # Fallback to username if FullName is empty
     return None
 
-# Paths for the log files
-json_file_path = "maintenance_logs.json"
-csv_file_path = "maintenance_logs.csv"
+# Get the shared path from the .env file
+shared_path = os.getenv("SHARED_PATH", ".")
+
+# Construct the full paths for JSON and CSV files using the shared path
+json_file_path = os.path.join(shared_path, "maintenance_logs.json")
+csv_file_path = os.path.join(shared_path, "maintenance_logs.csv")
 
 # Get salt from environment variable or generate one
 env_salt = os.getenv("SALT_GEN")
