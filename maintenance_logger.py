@@ -73,6 +73,9 @@ def get_next_entry_id():
         # If no logs exist, start from 1
         return 1
 
+# Get the image path from the environment variable or use a default value
+logo_img_path = os.getenv("LOGO_IMG", "images/generic_logo.png")
+
 # Function to get the path to bundled files in PyInstaller
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
@@ -90,7 +93,7 @@ app = tk.Tk()
 app.title("Maintenance Log Menu")
 
 # Load the company logo using the correct path
-image_path = resource_path("images/company_logo.png")
+image_path = resource_path(logo_img_path)
 image = Image.open(image_path)
 
 # Resize the image to 50% of its original size using LANCZOS filter

@@ -6,6 +6,17 @@ IF ERRORLEVEL 1 (
     exit /b 1
 )
 
+REM Check if pip is installed
+python -m pip --version >nul 2>&1
+IF ERRORLEVEL 1 (
+    echo pip is not installed. Installing pip...
+    python -m ensurepip --upgrade
+    IF ERRORLEVEL 1 (
+        echo Failed to install pip. Please install pip manually and try again.
+        exit /b 1
+    )
+)
+
 REM Create a Python virtual environment in the current directory
 echo Creating virtual environment...
 python -m venv venv
