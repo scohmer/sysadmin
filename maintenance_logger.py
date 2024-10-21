@@ -1,5 +1,6 @@
 import tkinter as tk
-from tkinter import messagebox, scrolledtext, PhotoImage
+from tkinter import messagebox, scrolledtext
+from PIL import Image, ImageTk  # Import Pillow to handle images
 import json
 import csv
 from datetime import datetime
@@ -22,7 +23,6 @@ def get_user_full_name():
         try:
             domain, username = user_name.split('\\')
         except ValueError:
-            # In case the domain is not included
             domain = None
             username = user_name
         users = c.Win32_UserAccount(Name=username)
@@ -235,8 +235,15 @@ def on_window_close(window):
 app = tk.Tk()
 app.title("Maintenance Log Menu")
 
-# Load the company logo (make sure you have a .png logo in the same directory)
-logo = PhotoImage(file="images/company_logo.png")
+# Load the company logo using Pillow
+image = Image.open("images/company_logo.png")
+
+# Resize the image to 50% of its original size
+width, height = image.size
+resized_image = image.resize((width // 2, height // 2), Image.ANTIALIAS)
+
+# Convert the resized image to a format Tkinter can use
+logo = ImageTk.PhotoImage(resized_image)
 
 # Display the company logo at the top of the window
 logo_label = tk.Label(app, image=logo)
