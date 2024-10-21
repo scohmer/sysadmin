@@ -6,5 +6,6 @@
 git clone the repo
 
 modify SALT_GEN variable within .env with a value to encrypt/decrypt log entries.
+modify SHARED_PATH variable within .env with a shared folder path where the log entries will be stored.
 
 Run install.bat from CMD

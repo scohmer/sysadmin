@@ -37,12 +37,15 @@ def get_user_full_name():
                     return username  # Fallback to username if FullName is empty
     return None
 
+# Get the current month and year
+current_month_year = datetime.now().strftime("%b_%Y").upper()
+
 # Get the shared path from the .env file
 shared_path = os.getenv("SHARED_PATH", ".")
 
 # Construct the full paths for JSON and CSV files using the shared path
-json_file_path = os.path.join(shared_path, "maintenance_logs.json")
-csv_file_path = os.path.join(shared_path, "maintenance_logs.csv")
+json_file_path = os.path.join(shared_path, f"{current_month_year}_maintenance_log.json")
+csv_file_path = os.path.join(shared_path, f"{current_month_year}_maintenance_log.csv")
 
 # Get salt from environment variable or generate one
 env_salt = os.getenv("SALT_GEN")
