@@ -1,7 +1,7 @@
---find-links ./dependencies
 altgraph==0.17.4
 packaging==24.1
 pefile==2023.2.7
+pillow==11.0.0
 pyinstaller==6.11.0
 pyinstaller-hooks-contrib==2024.9
 python-dotenv==1.0.1
