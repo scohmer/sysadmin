@@ -79,6 +79,10 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
+# Initialize the main menu window
+app = tk.Tk()
+app.title("Maintenance Log Menu")
+
 # Load the company logo using the correct path
 image_path = resource_path("images/company_logo.png")
 image = Image.open(image_path)
@@ -89,6 +93,10 @@ resized_image = image.resize((width // 2, height // 2), Image.LANCZOS)
 
 # Convert the resized image to a format Tkinter can use
 logo = ImageTk.PhotoImage(resized_image)
+
+# Display the company logo at the top of the window
+logo_label = tk.Label(app, image=logo)
+logo_label.pack(pady=20)
 
 # Function to log actions (Logger)
 def log_action():
@@ -258,14 +266,6 @@ def open_viewer():
 def on_window_close(window):
     window.destroy()
     app.deiconify()
-
-# Create the main menu window
-app = tk.Tk()
-app.title("Maintenance Log Menu")
-
-# Display the company logo at the top of the window
-logo_label = tk.Label(app, image=logo)
-logo_label.pack(pady=20)
 
 # Add the title and buttons
 tk.Label(app, text="Select an Application", font=('Helvetica', 14)).pack(pady=20)
