@@ -107,7 +107,7 @@ logo_label.pack(pady=20)
 # Function to log actions (Logger)
 def log_action():
     hostname = hostname_entry.get()
-    action_taken = action_entry.get()
+    action_taken = action_entry.get("1.0", tk.END).strip()
 
     if not hostname or not action_taken:
         messagebox.showerror("Input Error", "Please fill in all fields.")
@@ -235,16 +235,19 @@ def open_logger():
     logo_label = tk.Label(logger_window, image=logo)
     logo_label.pack(pady=20)
 
+    # Hostname label and input
     tk.Label(logger_window, text="Hostname:").pack(pady=5)
     global hostname_entry
     hostname_entry = tk.Entry(logger_window)
     hostname_entry.pack(pady=5)
 
+    # Action Taken label and larger input box (Text widget)
     tk.Label(logger_window, text="Action Taken:").pack(pady=5)
     global action_entry
-    action_entry = tk.Entry(logger_window)
+    action_entry = tk.Text(logger_window, width=40, height=5, wrap=tk.WORD)  # Multi-line input
     action_entry.pack(pady=5)
 
+    # Log Action button
     log_button = tk.Button(logger_window, text="Log Action", command=log_action)
     log_button.pack(pady=10)
 
