@@ -31,7 +31,7 @@ IF ERRORLEVEL 1 (
 
 REM Create the executable using PyInstaller
 echo Creating the executable...
-pyinstaller --onefile --windowed maintenance_logger.py
+pyinstaller --add-data "images/company_logo.png:images" --onefile --windowed maintenance_logger.py
 
 REM Clean up PyInstaller build files
 echo Cleaning up build files...

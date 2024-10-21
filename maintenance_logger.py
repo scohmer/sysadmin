@@ -1,11 +1,12 @@
+import os
+import sys
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
-from PIL import Image, ImageTk  # Import Pillow to handle images
+from PIL import Image, ImageTk
 import json
 import csv
 from datetime import datetime
 import wmi
-import os
 import hashlib
 from dotenv import load_dotenv
 
@@ -23,6 +24,7 @@ def get_user_full_name():
         try:
             domain, username = user_name.split('\\')
         except ValueError:
+            # In case the domain is not included
             domain = None
             username = user_name
         users = c.Win32_UserAccount(Name=username)
@@ -64,6 +66,29 @@ def get_next_entry_id():
     except (FileNotFoundError, json.JSONDecodeError):
         # If no logs exist, start from 1
         return 1
+
+# Function to get the path to bundled files in PyInstaller
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except AttributeError:
+        # When running in a normal environment (not bundled), use the script's directory
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+# Load the company logo using the correct path
+image_path = resource_path("images/company_logo.png")
+image = Image.open(image_path)
+
+# Resize the image to 50% of its original size using LANCZOS filter
+width, height = image.size
+resized_image = image.resize((width // 2, height // 2), Image.LANCZOS)
+
+# Convert the resized image to a format Tkinter can use
+logo = ImageTk.PhotoImage(resized_image)
 
 # Function to log actions (Logger)
 def log_action():
@@ -126,7 +151,6 @@ def log_action():
         writer.writerow(csv_log_entry)
 
     # Success message after log entry is written
-    print("Log action reached")  # Debugging line to check if this point is reached
     messagebox.showinfo("Success", f"Action logged successfully! Log Entry ID: {entry_id}")
     
     # Clear inputs
@@ -193,18 +217,22 @@ def open_logger():
     logger_window = tk.Toplevel(app)
     logger_window.title("Logger")
 
-    tk.Label(logger_window, text="Hostname:").grid(row=0, column=0, padx=10, pady=5)
+    # Display the company logo at the top of the Logger window
+    logo_label = tk.Label(logger_window, image=logo)
+    logo_label.pack(pady=20)
+
+    tk.Label(logger_window, text="Hostname:").pack(pady=5)
     global hostname_entry
     hostname_entry = tk.Entry(logger_window)
-    hostname_entry.grid(row=0, column=1, padx=10, pady=5)
+    hostname_entry.pack(pady=5)
 
-    tk.Label(logger_window, text="Action Taken:").grid(row=1, column=0, padx=10, pady=5)
+    tk.Label(logger_window, text="Action Taken:").pack(pady=5)
     global action_entry
     action_entry = tk.Entry(logger_window)
-    action_entry.grid(row=1, column=1, padx=10, pady=5)
+    action_entry.pack(pady=5)
 
     log_button = tk.Button(logger_window, text="Log Action", command=log_action)
-    log_button.grid(row=2, column=0, columnspan=2, pady=10)
+    log_button.pack(pady=10)
 
     logger_window.protocol("WM_DELETE_WINDOW", lambda: on_window_close(logger_window))
 
@@ -234,16 +262,6 @@ def on_window_close(window):
 # Create the main menu window
 app = tk.Tk()
 app.title("Maintenance Log Menu")
-
-# Load the company logo using Pillow
-image = Image.open("images/company_logo.png")
-
-# Resize the image to 50% of its original size
-width, height = image.size
-resized_image = image.resize((width // 2, height // 2), Image.ANTIALIAS)
-
-# Convert the resized image to a format Tkinter can use
-logo = ImageTk.PhotoImage(resized_image)
 
 # Display the company logo at the top of the window
 logo_label = tk.Label(app, image=logo)
